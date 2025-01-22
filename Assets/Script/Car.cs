@@ -1,15 +1,36 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using TMPro;
 
 public class Car : MonoBehaviour
 {
     private int Gas = 100;
+    public TMP_Text GasText;
 
-    void Awake()
+    private bool isConsumingGas = true; // Gas 감소 플래그
+
+    void Start()
     {
-        
+        UpdateGasText(); // 초기 Gas 값을 UI에 표시
+        ConsumeGas(); // Gas 감소 시작
+    }
+
+    private async void ConsumeGas()
+    {
+        while (isConsumingGas)
+        {
+            if (Gas > 0)
+            {
+                Gas -= 10; // Gas 감소
+                UpdateGasText(); // UI 갱신
+            }
+
+            // Gas 값 감소 후 1초 대기
+            await UniTask.Delay(1000);
+        }
     }
 
     void Update()
@@ -30,10 +51,22 @@ public class Car : MonoBehaviour
                 transform.position += Vector3.right * Time.deltaTime * 3f;
             }
         }
+
+        if (Gas <= 0)
+        {
+            Time.timeScale = 0;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        Gas += 30;
+        Gas += 30; // 충돌 시 Gas 증가
+        UpdateGasText(); // UI 갱신
+    }
+
+    private void UpdateGasText()
+    {
+        // UI 텍스트에 Gas 값 표시
+        GasText.text = "Gas: " + Gas.ToString();
     }
 }
