@@ -9,9 +9,13 @@ public class Car : MonoBehaviour
 {
     private int Gas = 100;
     public TMP_Text GasText;
-
+    public GameObject EndPanel;
     private bool isConsumingGas = true; // Gas 감소 플래그
 
+    void Awake()
+    {
+        Time.timeScale = 0;
+    }
     void Start()
     {
         UpdateGasText(); // 초기 Gas 값을 UI에 표시
@@ -22,14 +26,14 @@ public class Car : MonoBehaviour
     {
         while (isConsumingGas)
         {
+            await UniTask.Delay(1000);
             if (Gas > 0)
             {
                 Gas -= 10; // Gas 감소
                 UpdateGasText(); // UI 갱신
             }
 
-            // Gas 값 감소 후 1초 대기
-            await UniTask.Delay(1000);
+            
         }
     }
 
@@ -55,6 +59,9 @@ public class Car : MonoBehaviour
         if (Gas <= 0)
         {
             Time.timeScale = 0;
+            EndPanel.SetActive(true);
+            Gas = 100;
+            UpdateGasText();
         }
     }
 
